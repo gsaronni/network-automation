@@ -23,18 +23,6 @@ Automated the entire node management workflow with a bash script leveraging F5's
 
 **Time reduction: 50 minutes → under 60 seconds**
 
-## Real-World Impact
-
-### First Deployment Story
-
-The first time I used this script in production was memorable for unexpected reasons. I was at a bar, two cocktails deep on a date, when I got the call about the patching window starting.
-
-I pulled out my laptop, ran the script, and walked my date through pressing 'Y' a few times. She wasn't a tech person, but the automation was simple enough that she could execute it flawlessly.
-
-The patching preparation completed in under a minute. We went back to our conversation.
-
-*(Plot twist: She's now my wife.)*
-
 ### Operational Benefits
 
 - **Time savings**: ~20 hours annually per operations team
