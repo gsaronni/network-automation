@@ -132,9 +132,8 @@ Potential improvements for extended functionality:
 
 - [ ] Add pre-flight checks (verify node counts before disabling)
 - [ ] Implement rollback on partial failures
-- [ ] Generate execution logs for audit trail
-- [ ] Add support for scheduled automation (cron integration)
-- [ ] Create web UI for non-CLI users
+- [ ] Generate execution logs for audit trail (Half done. Can log timestamps redirecting output)
+- [x] Add support for scheduled automation (cron integration)
 - [ ] Extend to additional F5 partitions as infrastructure grows
 
 ## License
