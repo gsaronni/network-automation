@@ -1,3 +1,72 @@
+# Parameters must be first!
+param(
+    [string]$Arg1,
+    [string]$Arg2
+)
+
+# Initialize variables
+$patchNumber = $null
+$dateInput = $null
+
+# Parse arguments
+if ($Arg1 -and $Arg2) {
+    # Two arguments provided - figure out which is which
+    if ($Arg1.Length -eq 1 -and $Arg2.Length -eq 4) {
+        $patchNumber = $Arg1
+        $dateInput = $Arg2
+    } elseif ($Arg1.Length -eq 4 -and $Arg2.Length -eq 1) {
+        $patchNumber = $Arg2
+        $dateInput = $Arg1
+    } else {
+        Write-Error "Invalid arguments. Usage: .\mailTemplate.ps1 [patch#] [DDMM] or [DDMM] [patch#]"
+        Write-Host "Examples:"
+        Write-Host "  .\mailTemplate.ps1 2 2710"
+        Write-Host "  .\mailTemplate.ps1 2710 2"
+        Write-Host "  .\mailTemplate.ps1 2"
+        Write-Host "  .\mailTemplate.ps1"
+        exit
+    }
+} elseif ($Arg1) {
+    # One argument - determine if it's patch number or date
+    if ($Arg1.Length -eq 1) {
+        $patchNumber = $Arg1
+    } elseif ($Arg1.Length -eq 4) {
+        $dateInput = $Arg1
+        # Patch number will be prompted below
+    } else {
+        Write-Error "Invalid argument. Must be 1 digit (patch #) or 4 digits (DDMM)"
+        Write-Host "Usage: .\mailTemplate.ps1 [patch#] [DDMM]"
+        exit
+    }
+}
+
+# Prompt for missing patch number if needed
+if (-not $patchNumber) {
+    $patchNumber = Read-Host "Enter the patch number (e.g., 1, 2, or 3)"
+}
+
+# Validate patch number
+if ($patchNumber -notmatch '^[1-3]$') {
+    Write-Error "Patch number must be 1, 2, or 3"
+    exit
+}
+
+# Handle date
+if ($dateInput) {
+    $day = $dateInput.Substring(0, 2)
+    $month = $dateInput.Substring(2, 2)
+    $year = (Get-Date).Year
+    try {
+        $dateObj = Get-Date -Year $year -Month $month -Day $day
+        $date = $dateObj.ToString("dd/MM/yyyy")
+    } catch {
+        Write-Warning "Invalid date '$dateInput'. Using today's date."
+        $date = Get-Date -Format "dd/MM/yyyy"
+    }
+} else {
+    $date = Get-Date -Format "dd/MM/yyyy"
+}
+
 function Send-PatchingEmail {
   param(
       [string]$patchNumber,
@@ -76,12 +145,10 @@ Notification of end of activity will follow with relative outcome
   }
 }
 
-# Prompt user for variables
-$patchNumber = Read-Host "Enter the patch number (e.g., 1, 2, or 3)"
-$date = Get-Date -Format "dd/MM/yyyy"
-$subject = "ProjectName - PATCHING T70$patchNumber - Company - MI5FDT70$patchNumber - $date"
-$recipients = "someone@no.it"
-$cc = "anyone@no.it"
+# Set up email details
+$subject = "FastDelivery - PATCHING T70$patchNumber - MI5FDT70$patchNumber - $date"
+$recipients = "someone@mail.hi; someone_else@isp.tv"
+$cc = "mind@your.own; some@mail.no"
 
 # Call the function to send emails
 Send-PatchingEmail -patchNumber $patchNumber -date $date -subject $subject
