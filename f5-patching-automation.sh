@@ -20,12 +20,15 @@
 # v0.1.2 - 2022-07-28: Refactored list and disable command logic
 # v1.3   - 2022-08-01: Added support for all three patching scenarios
 # v1.4   - 2022-08-01: Completed all T71, T72, T73 patching workflows
+# v1.5   - 2025-09-30: Embellished code and comments
+# v1.6   - 2025-10-22: Added interactiveless run for crontab
 
 ################################################################################
 # Function: t71-switcher
 # Description: Handles T71 patching scenario nodes across all F5 partitions
 # Parameters: Uses global $answer variable for action selection
 ################################################################################
+
 t71-switcher() {
   echo "=== Processing T71 Patching Scenario ==="
   
@@ -225,6 +228,51 @@ main() {
 ################################################################################
 # Script Entry Point
 ################################################################################
+
+# Handle command-line arguments if provided
+if [[ $# -eq 2 ]]; then
+  pick="$1"
+  answer="$2"
+  
+  # Validate scenario input
+  if [[ ! "$pick" =~ ^[1-3]$ ]]; then
+    echo "ERROR: Invalid scenario '$pick'. Must be 1, 2, or 3."
+    echo "Usage: $0 [scenario] [action]"
+    echo "  scenario: 1, 2, or 3"
+    echo "  action: l (list), d (disable), e (enable)"
+    exit 1
+  fi
+  
+  # Validate action input
+  if [[ ! "$answer" =~ ^[ldeLDE]$ ]]; then
+    echo "ERROR: Invalid action '$answer'. Must be l, d, or e."
+    echo "Usage: $0 [scenario] [action]"
+    echo "  scenario: 1, 2, or 3"
+    echo "  action: l (list), d (disable), e (enable)"
+    exit 1
+  fi
+  
+  # Convert to lowercase and run
+  answer=$(echo "$answer" | tr '[:upper:]' '[:lower:]')
+  echo "=========================================="
+  echo "F5 BigIP Patching Automation (Non-interactive)"
+  echo "Started: $(date '+%Y-%m-%d %H:%M:%S')"
+  echo "Scenario: T7${pick}, Action: ${answer}"
+  echo "=========================================="
+  t7$pick-switcher
+  echo "Completed: $(date '+%Y-%m-%d %H:%M:%S')"
+  echo ""
+  exit 0
+elif [[ $# -gt 0 ]]; then
+  echo "ERROR: Incorrect number of arguments."
+  echo "Usage: $0 [scenario] [action]"
+  echo "  scenario: 1, 2, or 3"
+  echo "  action: l (list), d (disable), e (enable)"
+  echo ""
+  echo "Run without arguments for interactive mode."
+  exit 1
+fi
+
 echo "=========================================="
 echo "F5 BigIP Patching Automation"
 echo "Started: $(date '+%Y-%m-%d %H:%M:%S')"
