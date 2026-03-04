@@ -132,6 +132,36 @@ These tools embody practical network automation:
 - **Maintainable**: Clear code, comprehensive documentation
 - **Progressive**: Simple solutions first, complexity only when needed
 
+## Docker Deployment
+
+### Build and Run with Docker
+```bash
+# Build image
+docker build -t network-backup-orchestrator .
+
+# Run container (interactive mode for credential input)
+docker run -it \
+  -v $(pwd)/backups:/backups \
+  --network host \
+  network-backup-orchestrator
+```
+
+### Using Docker Compose
+```bash
+# Start service
+docker-compose up
+
+# Run one-time backup
+docker-compose run --rm network-backup
+```
+
+**Benefits:**
+- Consistent Python environment across systems
+- No local dependency installation required
+- Isolated execution environment
+- Easy deployment to backup servers
+
+
 ## Known Limitations & Future Roadmap
 
 ### Current Constraints
