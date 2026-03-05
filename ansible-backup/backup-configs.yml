@@ -1,0 +1,48 @@
+---
+- name: Backup network device configurations
+  hosts: nexus_switches,asr_routers
+  gather_facts: false
+  
+  vars:
+    timestamp: "{{ ansible_date_time.date }}_{{ ansible_date_time.time }}"
+  
+  tasks:
+    - name: Ensure backup directory exists
+      file:
+        path: "{{ backup_path }}/{{ ansible_date_time.date }}"
+        state: directory
+      delegate_to: localhost
+      run_once: true
+    
+    - name: Save running config to startup
+      cisco.ios.ios_command:
+        commands:
+          - command: copy running-config startup-config
+            prompt: 'Destination filename'
+            answer: "\r"
+      when: ansible_network_os == 'cisco_ios'
+    
+    - name: Get running configuration
+      cisco.ios.ios_command:
+        commands:
+          - show running-config
+      register: config_output
+    
+    - name: Save configuration to file
+      copy:
+        content: "{{ config_output.stdout[0] }}"
+        dest: "{{ backup_path }}/{{ ansible_date_time.date }}/{{ inventory_hostname }}_{{ timestamp }}.cfg"
+      delegate_to: localhost
+    
+    - name: Confirm backup
+      debug:
+        msg: "✓ Backed up {{ inventory_hostname }}"
+
+- name: Upload backups to server
+  hosts: backup_server
+  gather_facts: false
+  
+  tasks:
+    - name: TODO - SFTP upload task
+      debug:
+        msg: "Would upload {{ backup_path }}/{{ ansible_date_time.date }}/ to backup server"

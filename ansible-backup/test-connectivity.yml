@@ -1,0 +1,22 @@
+---
+- name: Test connectivity to all network devices
+  hosts: all:!backup_server
+  gather_facts: false
+  
+  tasks:
+    - name: Gather device facts
+      cisco.ios.ios_facts:
+        gather_subset: min
+      when: ansible_network_os in ['cisco_ios', 'cisco_nxos']
+      register: device_info
+      ignore_errors: true
+    
+    - name: Display connection status
+      debug:
+        msg: "✓ Connected to {{ inventory_hostname }} ({{ ansible_host }})"
+      when: device_info is succeeded
+    
+    - name: Show connection failure
+      debug:
+        msg: "✗ Failed to connect to {{ inventory_hostname }}"
+      when: device_info is failed
